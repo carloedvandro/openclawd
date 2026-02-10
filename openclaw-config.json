@@ -6,6 +6,9 @@
     "auth": {
       "mode": "token",
       "token": "localtoken"
+    },
+    "controlUi": {
+      "allowInsecureAuth": true
     }
   },
   "agents": {

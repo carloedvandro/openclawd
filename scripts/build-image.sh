@@ -67,6 +67,9 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     "auth": {
       "mode": "token",
       "token": "localtoken"
+    },
+    "controlUi": {
+      "allowInsecureAuth": true
     }
   },
   "agents": {
