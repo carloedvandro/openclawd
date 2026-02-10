@@ -33,4 +33,4 @@ USER node
 
 EXPOSE 18789
 
-CMD ["node", "dist/entry.js", "gateway", "run", "--bind", "lan", "--port", "18789", "--force"]
+CMD ["node", "dist/entry.js", "gateway", "run", "--bind", "lan", "--port", "18789", "--force", "--allow-unconfigured"]

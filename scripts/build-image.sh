@@ -61,6 +61,7 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
   cat > "$CONFIG_FILE" <<'EOF'
 {
   "gateway": {
+    "mode": "local",
     "bind": "lan",
     "port": 18789,
     "auth": {
