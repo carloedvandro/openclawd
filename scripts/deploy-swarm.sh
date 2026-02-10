@@ -4,11 +4,19 @@ set -euo pipefail
 # ============================================================================
 # OpenClaw Docker Swarm Deploy Script (Ollama Edition)
 #
-# Usage (no servidor):
+# Interativo:
+#   bash <(curl -sSL https://raw.githubusercontent.com/carloedvandro/openclawd/main/scripts/deploy-swarm.sh)
+#
+# Não-interativo (com env vars):
+#   OLLAMA_URL=https://apiollama.ychat-ia.com.br/v1 \
+#   MODEL_NAME=llama3.2:3b \
+#   GW_TOKEN=meutoken \
+#   GW_PORT=18789 \
 #   curl -sSL https://raw.githubusercontent.com/carloedvandro/openclawd/main/scripts/deploy-swarm.sh | bash
 #
-# Ou manualmente:
-#   bash deploy-swarm.sh
+# Ou baixar e rodar:
+#   curl -sSL https://raw.githubusercontent.com/carloedvandro/openclawd/main/scripts/deploy-swarm.sh -o /tmp/deploy.sh
+#   bash /tmp/deploy.sh
 # ============================================================================
 
 BOLD='\033[1m'
@@ -27,6 +35,18 @@ log()   { echo -e "${GREEN}[✓]${NC} $*"; }
 warn()  { echo -e "${YELLOW}[!]${NC} $*"; }
 error() { echo -e "${RED}[✗]${NC} $*"; exit 1; }
 ask()   { echo -en "${BOLD}$1${NC} "; }
+
+# Lê input do terminal (funciona mesmo via curl|bash)
+read_input() {
+  if [ -t 0 ]; then
+    read -r "$@"
+  elif [ -e /dev/tty ]; then
+    read -r "$@" < /dev/tty
+  else
+    # Sem terminal disponível, retorna vazio (usará defaults)
+    eval "${!#}=''"
+  fi
+}
 
 banner() {
   echo -e "${CYAN}"
@@ -79,29 +99,37 @@ configure() {
   echo -e "${BOLD}=== Configuração ===${NC}"
   echo ""
 
-  # Ollama endpoint
+  # Ollama endpoint (aceita env var OLLAMA_URL)
   local default_ollama_url="https://apiollama.ychat-ia.com.br/v1"
-  ask "URL do Ollama API [$default_ollama_url]:"
-  read -r OLLAMA_URL
+  if [ -z "${OLLAMA_URL:-}" ]; then
+    ask "URL do Ollama API [$default_ollama_url]:"
+    read_input OLLAMA_URL
+  fi
   OLLAMA_URL="${OLLAMA_URL:-$default_ollama_url}"
 
-  # Modelo
+  # Modelo (aceita env var MODEL_NAME)
   local default_model="llama3.2:3b"
-  ask "Modelo padrão [$default_model]:"
-  read -r MODEL_NAME
+  if [ -z "${MODEL_NAME:-}" ]; then
+    ask "Modelo padrão [$default_model]:"
+    read_input MODEL_NAME
+  fi
   MODEL_NAME="${MODEL_NAME:-$default_model}"
 
-  # Token do gateway
+  # Token do gateway (aceita env var GW_TOKEN)
   local default_token
   default_token=$(openssl rand -hex 16 2>/dev/null || echo "openclaw-$(date +%s)")
-  ask "Token de autenticação do gateway [$default_token]:"
-  read -r GW_TOKEN
+  if [ -z "${GW_TOKEN:-}" ]; then
+    ask "Token de autenticação do gateway [$default_token]:"
+    read_input GW_TOKEN
+  fi
   GW_TOKEN="${GW_TOKEN:-$default_token}"
 
-  # Porta
+  # Porta (aceita env var GW_PORT)
   local default_port="18789"
-  ask "Porta do gateway [$default_port]:"
-  read -r GW_PORT
+  if [ -z "${GW_PORT:-}" ]; then
+    ask "Porta do gateway [$default_port]:"
+    read_input GW_PORT
+  fi
   GW_PORT="${GW_PORT:-$default_port}"
 
   # Gerar openclaw-config.json
