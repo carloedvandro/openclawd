@@ -17,7 +17,7 @@
   "models": {
     "providers": {
       "ollama": {
-        "baseUrl": "https://apiollama.ychat-ia.com.br/v1",
+        "baseUrl": "http://ollama_ollama:11434/v1",
         "api": "openai-completions",
         "apiKey": "ollama",
         "models": [

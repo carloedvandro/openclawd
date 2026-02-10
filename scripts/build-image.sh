@@ -78,7 +78,7 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
   "models": {
     "providers": {
       "ollama": {
-        "baseUrl": "https://apiollama.ychat-ia.com.br/v1",
+        "baseUrl": "http://ollama_ollama:11434/v1",
         "api": "openai-completions",
         "apiKey": "ollama",
         "models": [
@@ -142,7 +142,7 @@ services:
       - NODE_ENV=production
       - NODE_OPTIONS=--max-old-space-size=1024
       - OLLAMA_API_KEY=ollama
-      - OLLAMA_BASE_URL=https://apiollama.ychat-ia.com.br/v1
+      - OLLAMA_BASE_URL=http://ollama_ollama:11434/v1
     volumes:
       - openclaw-data:/home/node/.openclaw
       - /opt/openclaw/openclaw-config.json:/home/node/.openclaw/openclaw.json:ro
@@ -157,6 +157,8 @@ services:
           memory: 2G
         reservations:
           memory: 512M
+    networks:
+      - NET
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
@@ -166,6 +168,10 @@ services:
 
 volumes:
   openclaw-data:
+
+networks:
+  NET:
+    external: true
 STACKEOF
 echo -e "${CYAN}--- Até aqui ---${NC}"
 echo ""
