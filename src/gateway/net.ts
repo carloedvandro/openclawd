@@ -93,7 +93,7 @@ export async function resolveGatewayBindHost(
   bind: import("../config/config.js").GatewayBindMode | undefined,
   customHost?: string,
 ): Promise<string> {
-  const mode = bind ?? "loopback";
+  const mode = bind ?? "lan";
 
   if (mode === "loopback") {
     // 127.0.0.1 rarely fails, but handle gracefully

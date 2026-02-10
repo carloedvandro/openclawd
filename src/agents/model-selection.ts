@@ -136,11 +136,11 @@ export function resolveConfiguredModelRef(params: {
       const aliasMatch = aliasIndex.byAlias.get(aliasKey);
       if (aliasMatch) return aliasMatch.ref;
 
-      // Default to anthropic if no provider is specified, but warn as this is deprecated.
+      // Default to DEFAULT_PROVIDER if no provider is specified, but warn as this is deprecated.
       console.warn(
-        `[openclaw] Model "${trimmed}" specified without provider. Falling back to "anthropic/${trimmed}". Please use "anthropic/${trimmed}" in your config.`,
+        `[openclaw] Model "${trimmed}" specified without provider. Falling back to "${params.defaultProvider}/${trimmed}". Please use "${params.defaultProvider}/${trimmed}" in your config.`,
       );
-      return { provider: "anthropic", model: trimmed };
+      return { provider: params.defaultProvider, model: trimmed };
     }
 
     const resolved = resolveModelRefFromString({

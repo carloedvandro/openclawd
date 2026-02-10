@@ -75,8 +75,8 @@ const QWEN_PORTAL_DEFAULT_COST = {
   cacheWrite: 0,
 };
 
-const OLLAMA_BASE_URL = "http://127.0.0.1:11434/v1";
-const OLLAMA_API_BASE_URL = "http://127.0.0.1:11434";
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL?.trim() || "http://127.0.0.1:11434/v1";
+const OLLAMA_API_BASE_URL = process.env.OLLAMA_API_BASE_URL?.trim() || process.env.OLLAMA_BASE_URL?.trim()?.replace(/\/v1\/?$/, "") || "http://127.0.0.1:11434";
 const OLLAMA_DEFAULT_CONTEXT_WINDOW = 128000;
 const OLLAMA_DEFAULT_MAX_TOKENS = 8192;
 const OLLAMA_DEFAULT_COST = {
@@ -446,13 +446,12 @@ export async function resolveImplicitProviders(params: {
     providers.xiaomi = { ...buildXiaomiProvider(), apiKey: xiaomiKey };
   }
 
-  // Ollama provider - only add if explicitly configured
+  // Ollama provider - always activate (Ollama doesn't require an API key)
   const ollamaKey =
     resolveEnvApiKeyVarName("ollama") ??
-    resolveApiKeyFromProfiles({ provider: "ollama", store: authStore });
-  if (ollamaKey) {
-    providers.ollama = { ...(await buildOllamaProvider()), apiKey: ollamaKey };
-  }
+    resolveApiKeyFromProfiles({ provider: "ollama", store: authStore }) ??
+    "ollama";
+  providers.ollama = { ...(await buildOllamaProvider()), apiKey: ollamaKey };
 
   return providers;
 }
