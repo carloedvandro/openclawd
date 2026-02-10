@@ -140,6 +140,7 @@ services:
       - "18789:18789"
     environment:
       - NODE_ENV=production
+      - NODE_OPTIONS=--max-old-space-size=1024
       - OLLAMA_API_KEY=ollama
       - OLLAMA_BASE_URL=https://apiollama.ychat-ia.com.br/v1
     volumes:
@@ -153,9 +154,9 @@ services:
         max_attempts: 5
       resources:
         limits:
-          memory: 512M
+          memory: 2G
         reservations:
-          memory: 256M
+          memory: 512M
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s

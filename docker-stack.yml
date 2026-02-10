@@ -28,9 +28,9 @@ services:
         max_attempts: 5
       resources:
         limits:
-          memory: 512M
+          memory: 2G
         reservations:
-          memory: 256M
+          memory: 512M
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
