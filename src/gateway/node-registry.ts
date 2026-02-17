@@ -43,7 +43,13 @@ export class NodeRegistry {
 
   register(client: GatewayWsClient, opts: { remoteIp?: string | undefined }) {
     const connect = client.connect;
-    const nodeId = connect.device?.id ?? connect.client.id;
+    const baseNodeId = connect.device?.id ?? connect.client.instanceId ?? connect.client.id;
+    let nodeId = baseNodeId;
+    const existing = this.nodesById.get(baseNodeId);
+    if (existing && existing.connId !== client.connId) {
+      const connSuffix = client.connId.slice(0, 8);
+      nodeId = `${baseNodeId}-${connSuffix}`;
+    }
     const caps = Array.isArray(connect.caps) ? connect.caps : [];
     const commands = Array.isArray((connect as { commands?: string[] }).commands)
       ? ((connect as { commands?: string[] }).commands ?? [])

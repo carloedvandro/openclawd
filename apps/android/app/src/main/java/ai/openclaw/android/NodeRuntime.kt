@@ -303,6 +303,12 @@ class NodeRuntime(context: Context) {
   val pendingRunCount: StateFlow<Int> = chat.pendingRunCount
 
   init {
+    val preconfiguredManualHost = prefs.manualHost.value.trim()
+    val preconfiguredManualPort = prefs.manualPort.value
+    if (!prefs.manualEnabled.value && preconfiguredManualHost.isNotEmpty() && preconfiguredManualPort in 1..65535) {
+      prefs.setManualEnabled(true)
+    }
+
     scope.launch {
       combine(
         voiceWakeMode,
@@ -523,13 +529,14 @@ class NodeRuntime(context: Context) {
   }
 
   private fun buildNodeConnectOptions(): GatewayConnectOptions {
+    val perInstanceNodeClientId = "openclaw-android-${instanceId.value.take(8)}"
     return GatewayConnectOptions(
       role = "node",
       scopes = emptyList(),
       caps = buildCapabilities(),
       commands = buildInvokeCommands(),
       permissions = emptyMap(),
-      client = buildClientInfo(clientId = "openclaw-android", clientMode = "node"),
+      client = buildClientInfo(clientId = perInstanceNodeClientId, clientMode = "node"),
       userAgent = buildUserAgent(),
     )
   }
@@ -537,7 +544,7 @@ class NodeRuntime(context: Context) {
   private fun buildOperatorConnectOptions(): GatewayConnectOptions {
     return GatewayConnectOptions(
       role = "operator",
-      scopes = emptyList(),
+      scopes = listOf("operator.admin", "operator.read"),
       caps = emptyList(),
       commands = emptyList(),
       permissions = emptyMap(),
